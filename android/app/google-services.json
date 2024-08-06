@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "781522359244",
+    "project_id": "projetfinance-38cb2",
+    "storage_bucket": "projetfinance-38cb2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781522359244:android:bde24f164d65461ee7c369",
+        "android_client_info": {
+          "package_name": "com.projetfinance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe8KckFkYpxcCNoEE2oRZA3L9OvG1aYc8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

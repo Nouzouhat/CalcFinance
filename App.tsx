@@ -1,118 +1,80 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState } from 'react';
+import { Text, View, TextInput, Alert, TouchableOpacity } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import Calculateur from './src/ecrans/calculateur';
+import { styles } from './src/styles/app';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+// Composant personnalisé pour les boutons
+const CustomButton = ({ title, onPress }: { title: string, onPress: () => void }) => (
+  <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Text style={styles.buttonText}>{title}</Text>
+  </TouchableOpacity>
+);
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// Composant pour l'inscription et la connexion
+const EcranAuth = ({ onAuthSuccess }: { onAuthSuccess: () => void }) => {
+  const [email, setEmail] = useState('');
+  const [motDePasse, setMotDePasse] = useState('');
+  const [estInscription, setEstInscription] = useState(true);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const gererAuth = async () => {
+    try {
+      if (estInscription) {
+        await auth().createUserWithEmailAndPassword(email, motDePasse);
+        Alert.alert('Inscription réussie !');
+      } else {
+        await auth().signInWithEmailAndPassword(email, motDePasse);
+        Alert.alert('Connexion réussie !');
+        onAuthSuccess();
+      }
+    } catch (error) {
+      Alert.alert('Erreur, veuillez vérifier vos identifiants');
+    }
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={styles.container}>
+      <Text style={styles.title}>{estInscription ? 'Inscription' : 'Connexion'}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <TextInput
+        style={styles.input}
+        placeholder="Mot de passe"
+        secureTextEntry
+        value={motDePasse}
+        onChangeText={setMotDePasse}
+      />
+      <CustomButton title={estInscription ? "S'inscrire" : 'Se connecter'} onPress={gererAuth} />
+      <CustomButton
+        title={`Passer à la ${estInscription ? 'connexion' : 'inscription'}`}
+        onPress={() => setEstInscription(!estInscription)}
+      />
+    </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+// Composant principal
+const App = () => {
+  const [estAuthentifie, setEstAuthentifie] = useState(false);
+
+  const gererAuthSuccess = () => {
+    setEstAuthentifie(true);
+  };
+
+  return (
+    <View style={styles.container}>
+      {!estAuthentifie ? (
+        <EcranAuth onAuthSuccess={gererAuthSuccess} />
+      ) : (
+        <Calculateur />
+      )}
+    </View>
+  );
+};
 
 export default App;
